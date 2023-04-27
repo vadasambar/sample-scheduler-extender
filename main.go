@@ -91,11 +91,9 @@ func decodeRequest(args interface{}, r *http.Request) error {
 		return errEmptyBody
 	}
 
-	if klog.V(l5).Enabled() {
-		requestDump, err := httputil.DumpRequest(r, true)
-		if err == nil {
-			klog.Infof("http-request:\n%v", string(requestDump))
-		}
+	requestDump, dumpErr := httputil.DumpRequest(r, true)
+	if dumpErr == nil {
+		klog.Infof("http-request:\n%v", string(requestDump))
 	}
 
 	decoder := json.NewDecoder(r.Body)
@@ -124,9 +122,9 @@ func writeResponse(w http.ResponseWriter, result interface{}) {
 
 func main() {
 
-	http.HandleFunc("apiv1/filter", filter)
+	http.HandleFunc("/apiv1/filter", filter)
 
-	klog.Info("Starting server")
+	klog.Info("Starting server at port :8080")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		panic(err)
 	}
