@@ -53,9 +53,9 @@ func filterNodes(args *extenderv1.ExtenderArgs) *extenderv1.ExtenderFilterResult
 	failedNodes := extenderv1.FailedNodesMap{}
 	result := extenderv1.ExtenderFilterResult{}
 
-	if args.NodeNames == nil || len(*args.NodeNames) == 0 {
+	if args.Nodes == nil || len(args.Nodes.Items) == 0 {
 		result.Error = "No nodes to compare. " +
-			"This should not happen, perhaps the extender is misconfigured with NodeCacheCapable == false."
+			"This should not happen, perhaps the extender is misconfigured with NodeCacheCapable == true."
 		klog.Error(result.Error)
 
 		return &result
