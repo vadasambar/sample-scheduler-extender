@@ -17,7 +17,7 @@ spec:
       containers:
       - name: sample-scheduler-extender
         command: ['sh', '-c', '/sample-scheduler-extender']
-        image: ghcr.io/vadasambar/sample-scheduler-extender:v1
+        image: ghcr.io/vadasambar/sample-scheduler-extender:v1.1
         ports:
         - containerPort: 8080
 ---
