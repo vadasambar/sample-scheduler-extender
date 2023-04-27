@@ -17,11 +17,6 @@ var (
 	errDecode    = errors.New("error decoding request")
 )
 
-const (
-	l4 = klog.Level(4)
-	l5 = klog.Level(5)
-)
-
 func filter(w http.ResponseWriter, req *http.Request) {
 	extenderArgs := &extenderv1.ExtenderArgs{}
 
@@ -41,7 +36,7 @@ func filter(w http.ResponseWriter, req *http.Request) {
 	}
 
 	writeResponse(w, filteredNodes)
-	klog.V(l4).Info("filter function done, responded")
+	klog.Info("filter function done, responded")
 
 }
 
@@ -61,7 +56,12 @@ func filterNodes(args *extenderv1.ExtenderArgs) *extenderv1.ExtenderFilterResult
 		return &result
 	}
 
-	klog.V(l5).Infof("filter %v:%v from %v locked", args.Pod.Namespace, args.Pod.Name, *args.NodeNames)
+	names := []string{}
+	for _, node := range args.Nodes.Items {
+		names = append(names, node.GetName())
+	}
+
+	klog.Infof("filter %v:%v from %v", args.Pod.Namespace, args.Pod.Name, names)
 
 	for _, node := range args.Nodes.Items {
 		if node.GetLabels()["extender"] == "true" {
