@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/klog/v2"
 	extenderv1 "k8s.io/kube-scheduler/extender/v1"
 )
@@ -43,8 +44,7 @@ func filter(w http.ResponseWriter, req *http.Request) {
 // filterNodes takes in the arguments for the scheduler and filters nodes based on
 // whether the POD resource request fits into each node.
 func filterNodes(args *extenderv1.ExtenderArgs) *extenderv1.ExtenderFilterResult {
-	var nodeNames []string
-
+	nodes := v1.NodeList{}
 	failedNodes := extenderv1.FailedNodesMap{}
 	result := extenderv1.ExtenderFilterResult{}
 
@@ -65,7 +65,7 @@ func filterNodes(args *extenderv1.ExtenderArgs) *extenderv1.ExtenderFilterResult
 
 	for _, node := range args.Nodes.Items {
 		if node.GetLabels()["extender"] == "true" {
-			nodeNames = append(nodeNames, node.GetName())
+			nodes.Items = append(nodes.Items, node)
 		} else {
 
 			failedNodes[node.GetName()] = "Doesn't have the label extender='true'"
@@ -75,7 +75,7 @@ func filterNodes(args *extenderv1.ExtenderArgs) *extenderv1.ExtenderFilterResult
 	}
 
 	result = extenderv1.ExtenderFilterResult{
-		NodeNames:   &nodeNames,
+		Nodes:       &nodes,
 		FailedNodes: failedNodes,
 		Error:       "",
 	}
