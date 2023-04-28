@@ -99,7 +99,10 @@ func decodeRequest(args interface{}, r *http.Request) error {
 	decoder := json.NewDecoder(r.Body)
 
 	if err := decoder.Decode(&args); err != nil {
-		return errDecode
+		if e, ok := err.(*json.SyntaxError); ok {
+			klog.Errorf("syntax error at byte offset %d", e.Offset)
+		}
+		return fmt.Errorf("%v: %v", errDecode, err)
 	}
 
 	err := r.Body.Close()
